@@ -20,7 +20,10 @@ void UPositionReporter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// ...
+	FString ObjectName = GetOwner()->GetName(); // Gets the name of the owner of this Component
+	FString ObjectPos = GetOwner()->GetTransform().GetLocation().ToString();
+	
+	UE_LOG(LogTemp, Warning, TEXT("%s is at %s"), *ObjectName, *ObjectPos);
 	
 }
 
