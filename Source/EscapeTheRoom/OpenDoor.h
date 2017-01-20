@@ -21,6 +21,33 @@ public:
 	// Called every frame
 	virtual void TickComponent( float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction ) override;
 
-		
-	
+private:
+	// Properties
+	// Angle to rotate the door
+	UPROPERTY(EditAnywhere)
+	float OpenAngle = 90.0f;
+
+	// The pressure plate
+	UPROPERTY(EditAnywhere)
+	ATriggerVolume* PressurePlate;
+
+	// The owner of this component
+	AActor* ObjectOwner;
+
+	// The AActor that can interact with PressurePlate
+	AActor* ActorThatOpens;
+
+	// The instant the door opened
+	float TimeDoorOpened;
+
+	// Time the door closes
+	UPROPERTY(EditAnywhere)
+	float TimeDoorCloses = 1.f;
+
+	// Methods
+	// Opens the door
+	void OpenDoor();
+
+	// Closes the door
+	void CloseDoor();
 };
