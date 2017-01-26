@@ -37,6 +37,7 @@ bool UMySaveSystem::CreateSaveFile(const FString Dir, const FString SaveFile)
 
 bool UMySaveSystem::SaveGameState(USaveGame * SaveGameObject, const FString Dir, const FString SaveFile)
 {
+
 	// Get the file for writting data 
 	FString TargetDir = FPaths::GameDir() + Dir;
 		
@@ -65,7 +66,7 @@ USaveGame * UMySaveSystem::LoadGameState(const FString Dir, const FString SaveFi
 	FFileHelper::LoadFileToArray(BinaryArray, *(TargetDir + SaveFile + ".sav"));
 
 	// Return deserialized data
-	USaveGame * SaveData = NULL;
+	USaveGame * SaveData = nullptr;
 	FMemoryReader FromBinary = FMemoryReader(BinaryArray, true);
 	
 	// Get the class name

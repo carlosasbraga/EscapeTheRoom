@@ -3,6 +3,7 @@
 #include "EscapeTheRoom.h"
 #include "OpenDoor.h"
 
+#define OUT
 
 // Sets default values for this component's properties
 UOpenDoor::UOpenDoor()
@@ -13,7 +14,6 @@ UOpenDoor::UOpenDoor()
 
 	// Get the owner 
 	ObjectOwner = GetOwner();
-
 }
 
 
@@ -22,47 +22,52 @@ void UOpenDoor::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// Initializes ActorThatSpawns as the DefaultPawn
-	ActorThatOpens = GetWorld()->GetFirstPlayerController()->GetPawn();
+	// Protect PressurePlate pointer
+	if (!PressurePlate)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("PressurePlate not found. nullptr reference."))
+	}
 
 }
-
 
 // Called every frame
 void UOpenDoor::TickComponent( float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction )
 {
 	Super::TickComponent( DeltaTime, TickType, ThisTickFunction );
 
-	// local variables
-	float Timer = 0.f; // timer for the door closing
-
 	// Once PressurePlate overlaps with ActorThatOpens
-	// rotate the owner of this component
-	if (PressurePlate->IsOverlappingActor(ActorThatOpens)) 
+	// broadcast the open event
+	if (GetTotalMassOfActorsOnPlate() > TriggerMass) 
 	{
-		OpenDoor();
-		TimeDoorOpened = GetWorld()->GetTimeSeconds();
+		OnOpenRequest.Broadcast();
 	}
-
-	// Calculates time since the door opened
-	// amd tests it to see if it is time to close it
-	Timer = GetWorld()->GetTimeSeconds() - TimeDoorOpened;
-	if (Timer >= TimeDoorCloses) 
+	else
 	{
-		CloseDoor();
+		OnCloseRequest.Broadcast();
 	}
 }
 
-// opens the door
-void UOpenDoor::OpenDoor()
-{
-	// Sets the yaw of the ObjectOwner to OpenAngle
-	ObjectOwner->SetActorRotation(FRotator(0.f, OpenAngle, 0.f));
-}
 
-void UOpenDoor::CloseDoor() 
+float UOpenDoor::GetTotalMassOfActorsOnPlate()
 {
-	// Sets the yaw of the ObjectOwner to 0
-	ObjectOwner->SetActorRotation(FRotator(0.f, 0.f, 0.f));
+	float TotalMass = 0.f;
+	TArray<AActor*> OverlappingActors;
+
+	// Escape the function if PressurePlate is a nullptr
+	if (!PressurePlate) 
+	{ 
+		return 0.f; 
+	}
+
+	// Find all the overlapping actors
+	PressurePlate->GetOverlappingActors(OUT OverlappingActors);
+
+	// Iterate through them adding their masses
+	for (const auto& DisposableActor : OverlappingActors)
+	{
+		TotalMass += DisposableActor->FindComponentByClass<UPrimitiveComponent>()->GetMass();
+	}
+
+	return TotalMass;
 }
 

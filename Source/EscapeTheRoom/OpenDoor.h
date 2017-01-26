@@ -5,13 +5,15 @@
 #include "Components/ActorComponent.h"
 #include "OpenDoor.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDoorEvent);
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class ESCAPETHEROOM_API UOpenDoor : public UActorComponent
 {
 	GENERATED_BODY()
 
 public:	
+	// Methods
 	// Sets default values for this component's properties
 	UOpenDoor();
 
@@ -21,33 +23,32 @@ public:
 	// Called every frame
 	virtual void TickComponent( float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction ) override;
 
+	// Properties
+	// Event for opening the doors
+	UPROPERTY(BlueprintAssignable)
+	FOnDoorEvent OnOpenRequest;
+
+	// Event for opening the doors
+	UPROPERTY(BlueprintAssignable)
+	FOnDoorEvent OnCloseRequest;
+
 private:
 	// Properties
-	// Angle to rotate the door
-	UPROPERTY(EditAnywhere)
-	float OpenAngle = 90.0f;
-
 	// The pressure plate
 	UPROPERTY(EditAnywhere)
-	ATriggerVolume* PressurePlate;
+	ATriggerVolume* PressurePlate = nullptr;
 
 	// The owner of this component
-	AActor* ObjectOwner;
+	AActor* ObjectOwner = nullptr;
 
-	// The AActor that can interact with PressurePlate
-	AActor* ActorThatOpens;
-
-	// The instant the door opened
-	float TimeDoorOpened;
-
-	// Time the door closes
+	// The mass necessary to opend doors
 	UPROPERTY(EditAnywhere)
-	float TimeDoorCloses = 1.f;
+	float TriggerMass = 50.f;
 
 	// Methods
-	// Opens the door
-	void OpenDoor();
 
 	// Closes the door
 	void CloseDoor();
+
+	float GetTotalMassOfActorsOnPlate();
 };

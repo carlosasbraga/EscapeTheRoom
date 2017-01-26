@@ -31,11 +31,13 @@ void UGrabber::TickComponent( float DeltaTime, ELevelTick TickType, FActorCompon
 	// Get direction the player is looking at
 	FVector LineTraceEnd = GetDirectionPlayerIsLookingAt();
 
-	// if the Physics Handle is attached
-	if (PhysicsHandle->GrabbedComponent) {
-		// move object we are holding
-		PhysicsHandle->SetTargetLocation(LineTraceEnd);
+	// Escape the function if the Physics Handle is a nullptr
+	if (!PhysicsHandle) { return; }
 
+	// If the Physics Handle is attached
+	if (PhysicsHandle->GrabbedComponent) {
+		// Move object we are holding
+		PhysicsHandle->SetTargetLocation(LineTraceEnd);
 	}
 }
 
@@ -49,10 +51,14 @@ void UGrabber::Grab()
 	// If we hit, grab the Actor 
 	if (ActorHit) 
 	{
-		PhysicsHandle->GrabComponentAtLocation(
+		// Escape the function if the Physics Handle is a nullptr
+		if (!PhysicsHandle) { return; }
+
+		PhysicsHandle->GrabComponentAtLocationWithRotation(
 			ComponentToGrab,
 			NAME_None,
-			ComponentToGrab->GetOwner()->GetActorLocation()
+			ComponentToGrab->GetOwner()->GetActorLocation(),
+			ComponentToGrab->GetOwner()->GetActorRotation()
 		);
 	}
 }
@@ -60,6 +66,9 @@ void UGrabber::Grab()
 // Release Physics handle
 void UGrabber::Release()
 {
+	// Escape the function if the Physics Handle is a nullptr
+	if (!PhysicsHandle) { return; }
+
 	PhysicsHandle->ReleaseComponent();
 }
 
