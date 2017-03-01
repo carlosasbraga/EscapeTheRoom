@@ -3,13 +3,13 @@
 #include "EscapeTheRoom.h"
 #include "MySaveSystem.h"
 
-bool UMySaveSystem::DoesFileExist(const FString Dir, const FString SaveFile)
+bool UMySaveSystem::DoesFileExist(const FString Dir, const FString SaveFile, const FString FileExtension)
 {
 	FString TargetDir = FPaths::GameDir() + Dir;
-	return FPaths::FileExists(TargetDir + SaveFile + ".sav");
+	return FPaths::FileExists(TargetDir + SaveFile + FileExtension);
 }
 
-bool UMySaveSystem::CreateSaveFile(const FString Dir, const FString SaveFile)
+bool UMySaveSystem::CreateSaveFile(const FString Dir, const FString SaveFile, const FString FileExtension)
 {
 	// Create directory
 	FString TargetDir = FPaths::GameDir() + Dir;
@@ -26,16 +26,16 @@ bool UMySaveSystem::CreateSaveFile(const FString Dir, const FString SaveFile)
 	}
 	
 	// Create empty save file
-	IFileHandle* FileHandle = PlatformFile.OpenWrite(*(TargetDir + SaveFile + ".sav"));
+	IFileHandle* FileHandle = PlatformFile.OpenWrite(*(TargetDir + SaveFile + FileExtension));
 	if (FileHandle) 
 	{
 		delete FileHandle;
 	}
 	
-	return FPaths::FileExists(TargetDir + SaveFile + ".sav");
+	return FPaths::FileExists(TargetDir + SaveFile + FileExtension);
 }
 
-bool UMySaveSystem::SaveGameState(USaveGame * SaveGameObject, const FString Dir, const FString SaveFile)
+bool UMySaveSystem::SaveGameState(USaveGame * SaveGameObject, const FString Dir, const FString SaveFile, const FString FileExtension)
 {
 
 	// Get the file for writting data 
@@ -53,17 +53,17 @@ bool UMySaveSystem::SaveGameState(USaveGame * SaveGameObject, const FString Dir,
 	SaveGameObject->Serialize(Ar);
 
 	// Write the data to SaveFile in TargetDir
-	return FFileHelper::SaveArrayToFile(MemoryWriter, *(TargetDir + SaveFile + ".sav"));
+	return FFileHelper::SaveArrayToFile(MemoryWriter, *(TargetDir + SaveFile + FileExtension));
 }
 
-USaveGame * UMySaveSystem::LoadGameState(const FString Dir, const FString SaveFile)
+USaveGame * UMySaveSystem::LoadGameState(const FString Dir, const FString SaveFile, const FString FileExtension)
 {
 	// Get the file for reading data
 	FString TargetDir = FPaths::GameDir() + Dir;
 		
 	// Read binary data to BinaryArray
 	TArray<uint8> BinaryArray;
-	FFileHelper::LoadFileToArray(BinaryArray, *(TargetDir + SaveFile + ".sav"));
+	FFileHelper::LoadFileToArray(BinaryArray, *(TargetDir + SaveFile + FileExtension));
 
 	// Return deserialized data
 	USaveGame * SaveData = nullptr;
